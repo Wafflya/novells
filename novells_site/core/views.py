@@ -54,7 +54,7 @@ def pay_prepare(request):
 @login_required
 def donate_money(request):
     Configuration.account_id = '819176'
-    Configuration.secret_key = 'live_Rj4b50yCpOzEirnhaHWgSJ_f-t9naP6WBSlAk8WlAss'
+    Configuration.secret_key = 'live_P5YzWIgdQiICiSEPpZ-bKR80-QlaGTWStgXvlysOQl4'
 
     #Configuration.account_id = '829811'
     #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
@@ -104,7 +104,7 @@ def donate_money(request):
 @csrf_exempt
 def my_webhook_handler(request):
     Configuration.account_id = '819176'
-    Configuration.secret_key = 'live_Rj4b50yCpOzEirnhaHWgSJ_f-t9naP6WBSlAk8WlAss'
+    Configuration.secret_key = 'live_P5YzWIgdQiICiSEPpZ-bKR80-QlaGTWStgXvlysOQl4'
 
     #Configuration.account_id = '829811'
     #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
@@ -122,8 +122,13 @@ def my_webhook_handler(request):
         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
             payed_user = response_object.metadata['user']
             payed_money = response_object.amount.value
+<<<<<<< HEAD
             # UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
+=======
+            us_b = UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
+>>>>>>> 67ce6a586b309608c8d01929922291ad2f598fd7
             print(payed_user, payed_money)
+
             p = Profile.objects.get(name_id=payed_user)
             p.balance += payed_money
             p.save(update_fields=['balance'])
