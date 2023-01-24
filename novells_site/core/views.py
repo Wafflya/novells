@@ -122,11 +122,9 @@ def my_webhook_handler(request):
         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
             payed_user = response_object.metadata['user']
             payed_money = response_object.amount.value
-<<<<<<< HEAD
             # UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
-=======
+
             us_b = UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
->>>>>>> 67ce6a586b309608c8d01929922291ad2f598fd7
             print(payed_user, payed_money)
 
             p = Profile.objects.get(name_id=payed_user)
