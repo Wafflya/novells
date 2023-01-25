@@ -1,45 +1,43 @@
 import json
+from datetime import date
+from datetime import datetime
 from decimal import Decimal
 
-from django.core.exceptions import PermissionDenied
-from django.utils import timezone
-
+import var_dump as var_dump
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.views import View
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
-from django.contrib.auth.decorators import login_required
-
-from .models import Novell, Chapter, LikeDislike, Profile, Genre, Rating, Slider, Post, Review, RatingStar, Comment, UserBalanceChange, ViewNovell
-from .forms import CommentForm, EditProfileForm, RatingForm
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseForbidden
-from rest_framework import viewsets, filters, views
+from rest_framework import views
 from rest_framework.response import Response
-from .serializers import NovellListSerializer
-import yookassa
-import var_dump as var_dump
+from yookassa import Configuration, Payment
+from yookassa.domain.common.confirmation_type import ConfirmationType
 from yookassa.domain.models.currency import Currency
 from yookassa.domain.models.receipt import Receipt
 from yookassa.domain.models.receipt_item import ReceiptItem
-from yookassa.domain.common.confirmation_type import ConfirmationType
-from yookassa.domain.request.payment_request_builder import PaymentRequestBuilder
-import json
-from django.http import HttpResponse
-from yookassa import Configuration, Payment
 from yookassa.domain.notification import WebhookNotificationEventType, WebhookNotification
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-from datetime import date
+from yookassa.domain.request.payment_request_builder import PaymentRequestBuilder
+
+from .forms import CommentForm, EditProfileForm, RatingForm
+from .models import Novell, Chapter, LikeDislike, Profile, Genre, Rating, Slider, Post, Review, RatingStar, Comment, \
+    UserBalanceChange, ViewNovell
+from .serializers import NovellListSerializer
+
 
 # Create your views here.
 
 
-#Configuration.account_id = '819176'
-#Configuration.secret_key = 'live__QoWec5bBgd00kgqy4xnSz245AQk2faiTHjPJN7tkiQ' # Old key
-#Configuration.secret_key = 'live_UaQb6za_zudoklGWzklf1GMIief0Yrhr7Q-YGtV-LsU'
+# Configuration.account_id = '819176'
+# Configuration.secret_key = 'live__QoWec5bBgd00kgqy4xnSz245AQk2faiTHjPJN7tkiQ' # Old key
+# Configuration.secret_key = 'live_UaQb6za_zudoklGWzklf1GMIief0Yrhr7Q-YGtV-LsU'
 
 # Configuration.account_id = '829811'
 # Configuration.secret_key = 'test__QoWec5bBgd00kgqy4xnSz245AQk2faiTHjPJN7tkiQ'
@@ -56,9 +54,8 @@ def donate_money(request):
     Configuration.account_id = '819176'
     Configuration.secret_key = 'live_0ltiGFdvXPsCEPfMdMgPM1bMahC4RXps3XCPMqy1cXI'
 
-    #Configuration.account_id = '829811'
-    #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
-
+    # Configuration.account_id = '829811'
+    # Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
 
     # Configuration.configure('819176', 'test__QoWec5bBgd00kgqy4xnSz245AQk2faiTHjPJN7tkiQ')
     receipt = Receipt()
@@ -73,7 +70,7 @@ def donate_money(request):
                 "currency": Currency.RUB
             },
             "vat_code": 2,
-            "capture":True
+            "capture": True
         }),
     ]
 
@@ -106,9 +103,8 @@ def my_webhook_handler(request):
     Configuration.account_id = '819176'
     Configuration.secret_key = 'live_0ltiGFdvXPsCEPfMdMgPM1bMahC4RXps3XCPMqy1cXI'
 
-    #Configuration.account_id = '829811'
-    #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
-
+    # Configuration.account_id = '829811'
+    # Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
 
     # Извлечение JSON объекта из тела запроса
     print(request)
@@ -124,8 +120,8 @@ def my_webhook_handler(request):
             payed_money = response_object.amount.value
             # UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
 
-            us_b = UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
-            print(payed_user, payed_money)
+            # us_b = UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
+            # print(payed_user, payed_money)
 
             p = Profile.objects.get(name_id=payed_user)
             p.balance += payed_money
@@ -163,7 +159,6 @@ def contact(request):
 
 
 def index(request):
-
     h = request.get_host()
     if h == 'www.privereda1.ru' or h == 'privereda1.ru':
         pop_novell = Novell.objects.filter(important=True, translator='Privereda1')
@@ -194,6 +189,7 @@ def index(request):
                                                          'test': test
                                                          })
 
+
 class NovellDetailView(GenreYear, DetailView):
     model = Novell
     context_object_name = 'novell'
@@ -205,7 +201,7 @@ class NovellDetailView(GenreYear, DetailView):
         nov.views = nov.views + 1
         nov.save()
         if self.request.user.is_staff == False:
-            ViewNovell.objects.create(novell = nov)
+            ViewNovell.objects.create(novell=nov)
         context['star_form'] = RatingForm()
 
         return context
@@ -237,10 +233,9 @@ class ChapterDetailView(DetailView):
             self.request.user.user_profile.chapter_readed.add(chapter)
         else:
             raise PermissionDenied
-            #return redirect('accounts/signup/')
-            #return redirect(novell.get_absolute_url())
-            #return redirect('account_signup')
-
+            # return redirect('accounts/signup/')
+            # return redirect(novell.get_absolute_url())
+            # return redirect('account_signup')
 
         if not chapter.premium:
             return chapter
@@ -248,16 +243,15 @@ class ChapterDetailView(DetailView):
         elif not self.request.user.is_anonymous and chapter not in self.request.user.user_profile.buyed_chapters.all():
             # "Вы пытаетесь открыть платную главу. Купите её, это не так дорого!"
             raise PermissionDenied
-            #return redirect('accounts/signup/')
-            #return redirect(novell.get_absolute_url())
+            # return redirect('accounts/signup/')
+            # return redirect(novell.get_absolute_url())
 
         elif not self.request.user.is_anonymous and chapter in self.request.user.user_profile.buyed_chapters.all():
             return chapter
         else:
             raise PermissionDenied
-            #return redirect('accounts/signup/')
-            #return redirect(novell.get_absolute_url())
-
+            # return redirect('accounts/signup/')
+            # return redirect(novell.get_absolute_url())
 
     def get(self, request, *args, **kwargs):
         try:
@@ -265,11 +259,11 @@ class ChapterDetailView(DetailView):
             if not self.object:
                 raise PermissionDenied
         except PermissionDenied:
-            return redirect('https://'+request.get_host()+'/accounts/signup/', permanent=True)
+            return redirect('https://' + request.get_host() + '/accounts/signup/', permanent=True)
         context = self.get_context_data(object=self.object)
 
         if request.user.is_staff == False:
-            ViewNovell.objects.create(novell = context['chapter'].novell)
+            ViewNovell.objects.create(novell=context['chapter'].novell)
 
         return self.render_to_response(context)
 
@@ -519,9 +513,11 @@ def buy_many_chapters(request, pk):
     else:
         return HttpResponse('Недостаточно средств или сбой системы')
 
+
 def create_transaction(user, amount, novell):
     if user.is_staff == False:
         UserBalanceChange.objects.create(user=user, amount=amount, novell=novell)
+
 
 class ProfileDetail(DetailView):
     model = Profile
@@ -586,7 +582,8 @@ class FilterNovellsView(GenreYear, ListView):
         elif not year_filter and not genre_filter:
             return Novell.objects.filter(translator=translator)
         else:
-            return Novell.objects.filter((Q(publish__year__in=year_filter) | Q(genres__in=genre_filter)) and Q(translator=translator)).distinct()
+            return Novell.objects.filter(
+                (Q(publish__year__in=year_filter) | Q(genres__in=genre_filter)) and Q(translator=translator)).distinct()
         # print(self.request.GET.getlist('year'))
 
 
@@ -644,7 +641,9 @@ class JsonFilterNovellsView(ListView):
 
         q = self.request.GET.get('q')
         if q:
-            return Novell.objects.filter(rus_title__icontains=q, translator=translator).values("rus_title", "overall_rating", "slug", "poster")
+            return Novell.objects.filter(rus_title__icontains=q, translator=translator).values("rus_title",
+                                                                                               "overall_rating", "slug",
+                                                                                               "poster")
 
         genre_filter = self.request.GET.getlist('genre')
         year_filter = self.request.GET.getlist('year')
@@ -654,7 +653,6 @@ class JsonFilterNovellsView(ListView):
         novell_status = self.request.GET.get('novell-trans-status')
         preset_query = Novell.objects.filter(translator=translator)
         translate_status = self.request.GET.get('translate-status')
-
 
         if chaptet_min:
             preset_query = preset_query.filter(chapter_count__gte=chaptet_min)
@@ -671,10 +669,11 @@ class JsonFilterNovellsView(ListView):
             preset_query = preset_query.filter(translate_status=False)
 
         if genre_filter and year_filter and len(genre_filter) == 1:
-            return preset_query.filter(publish__year__in=year_filter, genres__in=genre_filter, translator=translator).values("rus_title",
-                                                                                                      "overall_rating",
-                                                                                                      "slug",
-                                                                                                      "poster")
+            return preset_query.filter(publish__year__in=year_filter, genres__in=genre_filter,
+                                       translator=translator).values("rus_title",
+                                                                     "overall_rating",
+                                                                     "slug",
+                                                                     "poster")
         elif len(genre_filter) > 1 and year_filter:
             genres_in_filter = [Genre.objects.get(id=i) for i in genre_filter]
             a = []
@@ -755,38 +754,41 @@ class NovellListViewApi(views.APIView):
         serializer = NovellListSerializer(novells, many=True)
         return Response(serializer.data)
 
+
 def views_for_novell(novell, date_filter, start_date, end_date):
-    views = ViewNovell.objects.filter(novell = novell)
+    views = ViewNovell.objects.filter(novell=novell)
 
     if date_filter == 'today':
         views = views.filter(datetime__date__gte=date.today())
     elif date_filter == 'month':
-        views = views.filter(datetime__year__gte = datetime.now().year,
-                             datetime__month__gte = datetime.now().month)
+        views = views.filter(datetime__year__gte=datetime.now().year,
+                             datetime__month__gte=datetime.now().month)
     elif date_filter == 'arbitrary_period':
-        views = views.filter(datetime__range = [start_date, end_date])
+        views = views.filter(datetime__range=[start_date, end_date])
 
     return len(views)
 
+
 def profit_for_novell(novell, date_filter, start_date, end_date):
-    transactions = UserBalanceChange.objects.filter(novell = novell)
+    transactions = UserBalanceChange.objects.filter(novell=novell)
 
     if date_filter == 'today':
         transactions = transactions.filter(datetime__date__gte=date.today())
     elif date_filter == 'month':
-        transactions = transactions.filter(datetime__year__gte = datetime.now().year,
-                                           datetime__month__gte = datetime.now().month)
+        transactions = transactions.filter(datetime__year__gte=datetime.now().year,
+                                           datetime__month__gte=datetime.now().month)
     elif date_filter == 'arbitrary_period':
-        transactions = transactions.filter(datetime__range = [start_date, end_date])
+        transactions = transactions.filter(datetime__range=[start_date, end_date])
 
     total_amount = sum(tr.amount for tr in transactions)
     return total_amount
 
+
 def get_url_primary(request, q):
     full_path = request.get_full_path()
-    
+
     if request.GET.get(q):
-        sep = full_path[full_path.find(q)-1]
+        sep = full_path[full_path.find(q) - 1]
         if request.GET.get(q) == '1':
             return full_path.replace(f"{sep}{q}=1", f"{sep}{q}=-1")
         elif request.GET.get(q) == '-1':
@@ -796,11 +798,13 @@ def get_url_primary(request, q):
         q = f"{sep}{q}=-1"
         return f"{full_path}{q}"
 
+
 def get_sorted_array(array, value, column):
-        if int(value) > 0:
-            return sorted(array, key=lambda i: i[column])
-        else:
-            return sorted(array, key=lambda i: i[column], reverse=True)
+    if int(value) > 0:
+        return sorted(array, key=lambda i: i[column])
+    else:
+        return sorted(array, key=lambda i: i[column], reverse=True)
+
 
 def statistic_view(request, *args, **kwargs):
     translator = request.GET.get('translator')
@@ -817,7 +821,8 @@ def statistic_view(request, *args, **kwargs):
         res = {}
         res["novell"] = novell.rus_title
         res["views"] = views_for_novell(novell, date_filter, request.GET.get('start_date'), request.GET.get('end_date'))
-        res["profit"] = profit_for_novell(novell, date_filter, request.GET.get('start_date'), request.GET.get('end_date'))
+        res["profit"] = profit_for_novell(novell, date_filter, request.GET.get('start_date'),
+                                          request.GET.get('end_date'))
         res_array.append(res)
         total["views"] += res["views"]
         total["profit"] += res["profit"]
@@ -832,19 +837,18 @@ def statistic_view(request, *args, **kwargs):
 
     if request.GET.get('sv'):
         res_array = get_sorted_array(res_array, request.GET.get('sv'), 'views')
-        
+
     if request.GET.get('sp'):
         res_array = get_sorted_array(res_array, request.GET.get('sp'), 'profit')
 
     return render(request, 'admin/statistics/base.html',
-            {
-                'result': res_array,
-                'total': total,
-                'result_headers': result_headers,
-                'start_date': request.GET.get('start_date'),
-                'end_date': request.GET.get('end_date'),
-                'translator': request.GET.get('translator'),
-                'date': request.GET.get('date')
-                }
-            ) 
-
+                  {
+                      'result': res_array,
+                      'total': total,
+                      'result_headers': result_headers,
+                      'start_date': request.GET.get('start_date'),
+                      'end_date': request.GET.get('end_date'),
+                      'translator': request.GET.get('translator'),
+                      'date': request.GET.get('date')
+                  }
+                  )

@@ -72,6 +72,11 @@ admin.site.register(Post)
 
 admin.site.register(Review)
 
-admin.site.register(UserBalanceChange)
+
+@admin.register(UserBalanceChange)
+class UserBalanceChangeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'datetime', 'novell')
+    list_filter = ('user',)
+
 
 admin.site.register(NovellArch)
