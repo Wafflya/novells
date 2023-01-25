@@ -478,7 +478,7 @@ class ViewNovell(models.Model):
 
 
 class BalanceUpdate(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='balance_changes',
+    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='changes_balance',
                              on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField('Сумма платежа', default=0, max_digits=18, decimal_places=6)
     datetime = models.DateTimeField('Дата', default=timezone.now)
