@@ -54,7 +54,7 @@ def pay_prepare(request):
 @login_required
 def donate_money(request):
     Configuration.account_id = '819176'
-    Configuration.secret_key = 'live_P5YzWIgdQiICiSEPpZ-bKR80-QlaGTWStgXvlysOQl4'
+    Configuration.secret_key = 'live_0ltiGFdvXPsCEPfMdMgPM1bMahC4RXps3XCPMqy1cXI'
 
     #Configuration.account_id = '829811'
     #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
@@ -84,7 +84,7 @@ def donate_money(request):
     builder.set_amount({"value": request.POST.get('sum'), "currency": Currency.RUB}) \
         .set_confirmation({"type": ConfirmationType.REDIRECT, "return_url": "https://privereda1.ru"}) \
         .set_capture(True) \
-        .set_description("Заказ №72") \
+        .set_description("Заказ №71") \
         .set_metadata({"user": int(request.user.id)}) \
         .set_receipt(receipt)
 
@@ -104,7 +104,7 @@ def donate_money(request):
 @csrf_exempt
 def my_webhook_handler(request):
     Configuration.account_id = '819176'
-    Configuration.secret_key = 'live_P5YzWIgdQiICiSEPpZ-bKR80-QlaGTWStgXvlysOQl4'
+    Configuration.secret_key = 'live_0ltiGFdvXPsCEPfMdMgPM1bMahC4RXps3XCPMqy1cXI'
 
     #Configuration.account_id = '829811'
     #Configuration.secret_key = 'test_3z2IRsWt9h2FRrKVBy9AaGkeMHt6appEWllT9614G5k'
