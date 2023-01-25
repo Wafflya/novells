@@ -86,7 +86,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="h4 card-title chapter_header d-flex justify-content-between">
-                            <div>Глава {{ chapter.number }}</div>
+                            <div>{{ chapter.title }}</div>
 
                             <div>
                                 <a type="button" class="btn btn-outline-backtonovell btn-sm"
@@ -96,9 +96,6 @@
                                 </a>
                             </div>
                         </div>
-                        <h5 class="card-subtitle">
-                            {{ chapter.title }}
-                        </h5>
                     </div>
                     <div class="card-body chapter_text">
                         {{ chapter.chapter_text|safe|linebreaks }}
