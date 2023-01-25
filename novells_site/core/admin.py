@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from .models import Genre, Novell, Chapter, Comment, LikeDislike, Profile, Rating, RatingStar, Slider, Post, Review, \
-    UserBalanceChange, NovellArch
+    UserBalanceChange, NovellArch, BalanceUpdate
 
 
 # Register your models here.
@@ -76,6 +76,12 @@ admin.site.register(Review)
 @admin.register(UserBalanceChange)
 class UserBalanceChangeAdmin(admin.ModelAdmin):
     list_display = ('user', 'amount', 'datetime', 'novell')
+    list_filter = ('user',)
+
+
+@admin.register(BalanceUpdate)
+class UserBalanceChangeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'datetime')
     list_filter = ('user',)
 
 

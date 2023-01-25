@@ -28,7 +28,7 @@ from yookassa.domain.request.payment_request_builder import PaymentRequestBuilde
 
 from .forms import CommentForm, EditProfileForm, RatingForm
 from .models import Novell, Chapter, LikeDislike, Profile, Genre, Rating, Slider, Post, Review, RatingStar, Comment, \
-    UserBalanceChange, ViewNovell
+    UserBalanceChange, ViewNovell, BalanceUpdate
 from .serializers import NovellListSerializer
 
 
@@ -118,10 +118,8 @@ def my_webhook_handler(request):
         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
             payed_user = response_object.metadata['user']
             payed_money = response_object.amount.value
-            # UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
 
-            UserBalanceChange.objects.create(user_id=payed_user, amount=payed_money)
-            # print(payed_user, payed_money)
+            BalanceUpdate.objects.create(user_id=payed_user, amount=payed_money)
 
             p = Profile.objects.get(name_id=payed_user)
             p.balance += payed_money

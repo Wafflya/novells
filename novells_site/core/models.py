@@ -482,3 +482,11 @@ class BalanceUpdate(models.Model):
                              on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField('Сумма платежа', default=0, max_digits=18, decimal_places=6)
     datetime = models.DateTimeField('Дата', default=timezone.now)
+
+    class Meta:
+        verbose_name = 'Пополнение баланса'
+        verbose_name_plural = 'Пополнения баланса'
+        ordering = ('-datetime',)
+
+    def __str__(self):
+        return 'Пополнение на {} от {}'.format(self.amount, self.user)
