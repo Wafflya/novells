@@ -1,13 +1,11 @@
 import collections
 
 from autoslug import AutoSlugField
+from colorfield.fields import ColorField
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from tinymce.models import HTMLField
-from colorfield.fields import ColorField
-
 # Create your models here.
 from django.db.models import Sum, Max
 from django.db.models.signals import post_save
@@ -15,6 +13,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from smart_selects.db_fields import ChainedForeignKey
+from tinymce.models import HTMLField
 
 
 class MyQuerySet(models.query.QuerySet):
@@ -455,7 +454,7 @@ class UserBalanceChange(models.Model):
     amount = models.DecimalField('Сумма платежа', default=0, max_digits=18, decimal_places=6)
     datetime = models.DateTimeField('Дата', default=timezone.now)
     novell = models.ForeignKey(Novell, verbose_name='Новелла', on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     class Meta:
         verbose_name = 'Транзакция'
         verbose_name_plural = 'Транзакции'
@@ -463,7 +462,8 @@ class UserBalanceChange(models.Model):
 
     def __str__(self):
         return 'Транзакция на {} от {}'.format(self.amount, self.user)
-    
+
+
 class ViewNovell(models.Model):
     novell = models.ForeignKey(Novell, verbose_name='Новелла', on_delete=models.CASCADE)
     datetime = models.DateTimeField('Дата', default=timezone.now)
@@ -476,3 +476,9 @@ class ViewNovell(models.Model):
     def __str__(self):
         return 'Просмотр новеллы {}'.format(self.novell)
 
+
+class BalanceUpdate(models.Model):
+    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='balance_changes',
+                             on_delete=models.SET_NULL, null=True)
+    amount = models.DecimalField('Сумма платежа', default=0, max_digits=18, decimal_places=6)
+    datetime = models.DateTimeField('Дата', default=timezone.now)

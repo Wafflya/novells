@@ -120,7 +120,7 @@ def my_webhook_handler(request):
             payed_money = response_object.amount.value
             # UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
 
-            # us_b = UserBalanceChange.objects.create(user=payed_user, amount=payed_money)
+            UserBalanceChange.objects.create(user_id=payed_user, amount=payed_money)
             # print(payed_user, payed_money)
 
             p = Profile.objects.get(name_id=payed_user)
