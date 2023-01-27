@@ -549,7 +549,7 @@
 
                                         <div class="d-flex justify-content-between">
                                         <span class="h5 mb-0">
-                                            {% if n.premium and user.is_authenticated and n in user.user_profile.buyed_chapters.all %}
+                                            {% if n.premium and user.is_authenticated and n in buyed_chapters %}
                                                 <i class="fa fa-unlock" aria-hidden="true"></i>
 
                                                 <!--
@@ -570,7 +570,7 @@
                                                 </span>
                                             {% endif %}
                                             <a
-                                                    {% if n.premium and user.is_authenticated and n in user.user_profile.buyed_chapters.all or not n.premium %}
+                                                    {% if n.premium and user.is_authenticated and n in buyed_chapters or not n.premium %}
                                                         href="{{ n.get_absolute_url }}"
                                                     {% elif not user.is_authenticated %}
                                                         data-toggle="modal" data-target="#loginModal"
@@ -582,7 +582,7 @@
                                             >
                                             {{ n.title }}
                                             </a>
-                                            {% if user.is_authenticated and n in user.user_profile.chapter_readed.all %}
+                                            {% if user.is_authenticated and n in buyed_chapters %}
                                                 <i class="bi bi-check2-square"></i>
                                             {% endif %}
                                             {% if not n.status %}

@@ -198,8 +198,11 @@ class NovellDetailView(GenreYear, DetailView):
         nov = context['novell']
         nov.views = nov.views + 1
         nov.save()
-        if self.request.user.is_staff == False:
+        if not self.request.user.is_staff:
             ViewNovell.objects.create(novell=nov)
+        if self.request.user:
+            context['buyed_chapters'] = self.request.user.user_profile.buyed_chapters.all()
+
         context['star_form'] = RatingForm()
 
         return context
