@@ -214,7 +214,7 @@
 
                                                    class="list-group-item list-group-item-action
                                     {% if not n.status %}list-group-item-warning disabled
-                                    {% elif user.is_authenticated and n in user.user_profile.chapter_readed.all %}
+                                    {% elif user.is_authenticated and n in read_chapters %}
                                     list-group-item-light
                                     {% else %}
                                     list-group-item-secondary
@@ -237,7 +237,7 @@
                                                              <i class="fa fa-lock" aria-hidden="true"></i>
                                                          {% endif %}
                                                             {{ n.title }}
-                                                            {% if user.is_authenticated and n in user.user_profile.chapter_readed.all %}
+                                                            {% if user.is_authenticated and n in read_chapters %}
                                                                 <i class="bi bi-check2-square"></i>
                                                             {% endif %}
                                                             {% if not n.status %}

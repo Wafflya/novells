@@ -228,21 +228,21 @@ class ChapterDetailView(DetailView):
     def get_object(self):
         novell = get_object_or_404(Novell, slug=self.kwargs['slug'])
         chapter = get_object_or_404(Chapter, novell=novell, number=self.kwargs['number'])
-        #
 
+        self._buyed_chapters = self.request.user.user_profile.buyed_chapters.all()
         if not self.request.user.is_anonymous:
             self.request.user.user_profile.chapter_readed.add(chapter)
         else:
             raise PermissionDenied
 
+        self._readed_chapters = self.request.user.user_profile.chapter_readed.all()
+
         if not chapter.premium:
             return chapter
 
-        elif not self.request.user.is_anonymous and chapter not in self.request.user.user_profile.buyed_chapters.all():
+        elif not self.request.user.is_anonymous and chapter not in self._buyed_chapters:
             raise PermissionDenied
-
-
-        elif not self.request.user.is_anonymous and chapter in self.request.user.user_profile.buyed_chapters.all():
+        elif not self.request.user.is_anonymous and chapter in self._buyed_chapters:
             return chapter
         else:
             raise PermissionDenied
@@ -258,7 +258,8 @@ class ChapterDetailView(DetailView):
 
         if not request.user.is_staff:
             ViewNovell.objects.create(novell=context['chapter'].novell)
-        context['bought_chapters'] = self.request.user.user_profile.buyed_chapters.all()
+        context['bought_chapters'] = self._buyed_chapters
+        context['read_chapters'] = self._readed_chapters
         return self.render_to_response(context)
 
 
