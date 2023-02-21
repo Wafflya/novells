@@ -102,7 +102,7 @@
                     </div>
                     <div class="card-footer d-flex justify-content-between">
 
-                        {% if chapter.prev_chapter_url %}
+                            {% if chapter.prev_chapter_url %}
                             <!-- Всплывающее окно покупки prev главы -->
                             <div class="modal fade" id="glbuychapterModal{{ chapter.prev_chapter.id }}">
                                 <div class="modal-dialog">
@@ -132,7 +132,7 @@
 
                             <a type="button" class="btn btn-outline-chapter-nav"
 
-                                    {% if chapter.prev_chapter.premium and user.is_authenticated and chapter.prev_chapter in user.user_profile.buyed_chapters.all or not chapter.prev_chapter.premium %}
+                                    {% if chapter.prev_chapter.premium and user.is_authenticated and chapter.prev_chapter in bought_chapters or not chapter.prev_chapter.premium %}
                                href="{{ chapter.prev_chapter_url }}"
                                     {% elif not user.is_authenticated %}
                                data-toggle="modal" data-target="#loginModal"
@@ -202,7 +202,7 @@
 
                                                 <a role="button"
 
-                                                        {% if n.premium and user.is_authenticated and n in user.user_profile.buyed_chapters.all or not n.premium %}
+                                                        {% if n.premium and user.is_authenticated and n in bought_chapters or not n.premium %}
                                                    href="{{ n.get_absolute_url }}"
                                                         {% elif not user.is_authenticated %}
                                                    data-toggle="modal" data-target="#loginModal"
@@ -226,7 +226,7 @@
 
 
                                                         <span class="h5 mb-0">
-                                                         {% if n.premium and user.is_authenticated and n in user.user_profile.buyed_chapters.all %}
+                                                         {% if n.premium and user.is_authenticated and n in bought_chapters %}
                                                              <i class="fa fa-unlock" aria-hidden="true"></i>
 
                                                              <!--
@@ -289,7 +289,7 @@
                             <a type="button" class="btn btn-outline-chapter-nav"
 
 
-                                    {% if chapter.next_chapter.premium and user.is_authenticated and chapter.next_chapter in user.user_profile.buyed_chapters.all or not chapter.next_chapter.premium %}
+                                    {% if chapter.next_chapter.premium and user.is_authenticated and chapter.next_chapter in bought_chapters or not chapter.next_chapter.premium %}
                                href="{{ chapter.next_chapter_url }}"
                                     {% elif not user.is_authenticated %}
                                data-toggle="modal" data-target="#loginModal"

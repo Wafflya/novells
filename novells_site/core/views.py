@@ -234,25 +234,18 @@ class ChapterDetailView(DetailView):
             self.request.user.user_profile.chapter_readed.add(chapter)
         else:
             raise PermissionDenied
-            # return redirect('accounts/signup/')
-            # return redirect(novell.get_absolute_url())
-            # return redirect('account_signup')
 
         if not chapter.premium:
             return chapter
 
         elif not self.request.user.is_anonymous and chapter not in self.request.user.user_profile.buyed_chapters.all():
-            # "Вы пытаетесь открыть платную главу. Купите её, это не так дорого!"
             raise PermissionDenied
-            # return redirect('accounts/signup/')
-            # return redirect(novell.get_absolute_url())
+
 
         elif not self.request.user.is_anonymous and chapter in self.request.user.user_profile.buyed_chapters.all():
             return chapter
         else:
             raise PermissionDenied
-            # return redirect('accounts/signup/')
-            # return redirect(novell.get_absolute_url())
 
     def get(self, request, *args, **kwargs):
         try:
@@ -263,9 +256,9 @@ class ChapterDetailView(DetailView):
             return redirect('https://' + request.get_host() + '/accounts/signup/', permanent=True)
         context = self.get_context_data(object=self.object)
 
-        if request.user.is_staff == False:
+        if not request.user.is_staff:
             ViewNovell.objects.create(novell=context['chapter'].novell)
-
+        context['bought_chapters'] = self.request.user.user_profile.buyed_chapters.all()
         return self.render_to_response(context)
 
 
