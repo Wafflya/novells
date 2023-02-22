@@ -229,12 +229,11 @@ class ChapterDetailView(DetailView):
         novell = get_object_or_404(Novell, slug=self.kwargs['slug'])
         chapter = get_object_or_404(Chapter, novell=novell, number=self.kwargs['number'])
 
-        self._buyed_chapters = self.request.user.user_profile.buyed_chapters.all()
         if not self.request.user.is_anonymous:
             self.request.user.user_profile.chapter_readed.add(chapter)
         else:
             raise PermissionDenied
-
+        self._buyed_chapters = self.request.user.user_profile.buyed_chapters.all()
         self._readed_chapters = self.request.user.user_profile.chapter_readed.all()
 
         if not chapter.premium:

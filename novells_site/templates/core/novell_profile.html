@@ -309,21 +309,7 @@
                                     {% endif %}
                                     {% if user.is_authenticated %}
 
-                                        <!--
-                                        {#% if novell in user.user_profile.bookmarks.all %#}
-                                            <a href="{% url 'core:del_from_bookmarks' novell.id 'bookmark' 'novell' %}"
-                                               type="button"
-                                               class="btn btn-outline-warning">В избранном <i
-                                                    class="bi bi-x-square-fill text-danger"></i>
-                                            </a>
-                                        {#% elif novell in user.user_profile.planned.all %#}
-                                            <a href="{% url 'core:del_from_bookmarks' novell.id 'planned' 'novell' %}"
-                                               type="button"
-                                               class="btn btn-outline-secondary">Запланированно <i
-                                                    class="bi bi-x-square-fill text-danger"></i>
-                                            </a>
-                                        {#% else %#}
--->
+
                                         <button class="btn btn-outline-light border-0 dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false"
                                                 style="background-color: rgba(18,61,106,0.75)">
